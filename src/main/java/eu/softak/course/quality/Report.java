@@ -18,16 +18,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class Report {
-	public void create()
-	{
+	public void create() {
 		Workbook workBook = new SXSSFWorkbook(-1);
 
 		workBook.getCreationHelper();
-		XSSFFont font = (XSSFFont)workBook.createFont();
+		XSSFFont font = (XSSFFont) workBook.createFont();
 		font.setBold(true);
 		font.setColor(HSSFColor.HSSFColorPredefined.BLUE_GREY.getIndex());
 		XSSFCellStyle style1 = (XSSFCellStyle) workBook.createCellStyle();
-		style1.setFillForegroundColor( HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex() );
+		style1.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
 		style1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		style1.setBorderBottom(BorderStyle.THIN);
 		style1.setBorderLeft(BorderStyle.THIN);
@@ -88,11 +87,9 @@ public class Report {
 		try {
 			outputStream = new FileOutputStream(new File("/raport.xlsx"));
 			workBook.write(outputStream);
-		}
-		catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
