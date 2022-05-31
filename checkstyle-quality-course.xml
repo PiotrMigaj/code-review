@@ -63,6 +63,13 @@
 		<module name="WhitespaceAround"/>
 		<module name="SuppressWarningsHolder"/>
 
+		<module name="MagicNumber">
+
+		</module>
+
+
+
+
 	</module>
 
 </module>
