@@ -21,42 +21,15 @@ import java.util.List;
 public class ExpensesExcelReport {
 	public void create() {
 		Workbook workBook = new SXSSFWorkbook(-1);
-
 		workBook.getCreationHelper();
-		XSSFFont font = (XSSFFont) workBook.createFont();
-		font.setBold(true);
-		font.setColor(HSSFColor.HSSFColorPredefined.BLUE_GREY.getIndex());
-
-		XSSFCellStyle style = getXssfCellStyle(workBook, HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
-		style.setFont(font);
-
-
 		Sheet sheet = workBook.createSheet("Bilans");
-		int startIndex = 0;
 
-		Row row = sheet.createRow(startIndex++);
+		addHeader(workBook, sheet);
+		addRowsWithExpenses(workBook, sheet);
+		saveAs(workBook);
+	}
 
-		List<String> list = List.of("Mc", "Przychód", "Mieszkanie", "Wyżywienie", "Transport", "Inne");
-		for (int i = 0; i < list.size(); i++) {
-			addData(row, i, list.get(i), style);
-		}
-
-		style = getXssfCellStyle(workBook, HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
-
-		Row row1 = sheet.createRow(startIndex++);
-		addData(row1, 0, "Styczeń", style);
-		List<Double> data = getDataFirstRow();
-		for (int i = 0; i < data.size(); i++) {
-			addData(row1, i + 1, data.get(i), style);
-		}
-
-		Row row2 = sheet.createRow(startIndex++);
-		addData(row2, 0, "Luty", style);
-		data = getDataSecondRow();
-		for (int i = 0; i < data.size(); i++) {
-			addData(row2, i + 1, data.get(i), style);
-		}
-
+	private void saveAs(Workbook workBook) {
 		OutputStream outputStream = null;
 		try {
 			outputStream = new FileOutputStream(new File("raport.xlsx"));
@@ -66,7 +39,37 @@ public class ExpensesExcelReport {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void addRowsWithExpenses(Workbook workBook, Sheet sheet) {
+		int startIndex = 1;
+		XSSFCellStyle style = getXssfCellStyle(workBook, HSSFColor.HSSFColorPredefined.YELLOW.getIndex());
+		Row row = sheet.createRow(startIndex++);
+		addData(row, 0, "Styczeń", style);
+		List<Double> data = getDataFirstRow();
+		for (int i = 0; i < data.size(); i++) {
+			addData(row, i + 1, data.get(i), style);
+		}
+
+		row = sheet.createRow(startIndex++);
+		addData(row, 0, "Luty", style);
+		data = getDataSecondRow();
+		for (int i = 0; i < data.size(); i++) {
+			addData(row, i + 1, data.get(i), style);
+		}
+	}
+
+	private void addHeader(Workbook workBook, Sheet sheet) {
+		XSSFFont font = (XSSFFont) workBook.createFont();
+		font.setBold(true);
+		font.setColor(HSSFColor.HSSFColorPredefined.BLUE_GREY.getIndex());
+		XSSFCellStyle style = getXssfCellStyle(workBook, HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+		style.setFont(font);
+		Row row = sheet.createRow(0);
+		List<String> list = List.of("Mc", "Przychód", "Mieszkanie", "Wyżywienie", "Transport", "Inne");
+		for (int i = 0; i < list.size(); i++) {
+			addData(row, i, list.get(i), style);
+		}
 	}
 
 	@SuppressWarnings("checkstyle:MagicNumber")
@@ -79,28 +82,28 @@ public class ExpensesExcelReport {
 		return List.of(4000.0, 1010.0);
 	}
 
-	private void addData(Row row1, int i, double v, XSSFCellStyle style2) {
-		Cell data12 = row1.createCell(i);
-		data12.setCellValue(v);
-		data12.setCellStyle(style2);
+	private void addData(Row row, int i, double v, XSSFCellStyle style) {
+		Cell data = row.createCell(i);
+		data.setCellValue(v);
+		data.setCellStyle(style);
 	}
 
-	private void addData(Row row, int i, String Mc, XSSFCellStyle style1) {
+	private void addData(Row row, int i, String value, XSSFCellStyle style) {
 		Cell data = row.createCell(i);
-		data.setCellValue(Mc);
-		data.setCellStyle(style1);
+		data.setCellValue(value);
+		data.setCellStyle(style);
 	}
 
 	private XSSFCellStyle getXssfCellStyle(Workbook workBook, short color) {
-		XSSFCellStyle style1 = (XSSFCellStyle) workBook.createCellStyle();
-		style1.setFillForegroundColor(color);
-		style1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		style1.setBorderBottom(BorderStyle.THIN);
-		style1.setBorderLeft(BorderStyle.THIN);
-		style1.setBorderRight(BorderStyle.THIN);
-		style1.setBorderTop(BorderStyle.THIN);
-		style1.setWrapText(true);
-		return style1;
+		XSSFCellStyle style = (XSSFCellStyle) workBook.createCellStyle();
+		style.setFillForegroundColor(color);
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		style.setBorderBottom(BorderStyle.THIN);
+		style.setBorderLeft(BorderStyle.THIN);
+		style.setBorderRight(BorderStyle.THIN);
+		style.setBorderTop(BorderStyle.THIN);
+		style.setWrapText(true);
+		return style;
 	}
 
 	public static void main(String[] args) {
