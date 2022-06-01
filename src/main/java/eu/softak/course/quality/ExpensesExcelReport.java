@@ -1,6 +1,5 @@
 package eu.softak.course.quality;
 
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -8,14 +7,15 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class ExpensesExcelReport {
 	public ByteArrayOutputStream create() throws IOException {
 		Workbook workBook = new SXSSFWorkbook(-1);
 		workBook.getCreationHelper();
-		Sheet sheet = workBook.createSheet("Bilans");
+		Sheet sheet = workBook.createSheet(ExpensesExcelReportDataProvider.sheetName());
 
 		addHeader(workBook, sheet);
 		addRowsWithExpenses(workBook, sheet);
@@ -32,43 +32,35 @@ public class ExpensesExcelReport {
 	private void addRowsWithExpenses(Workbook workBook, Sheet sheet) {
 		int startIndex = 1;
 		XSSFCellStyle style = StyleUtils.getDataStyle(workBook);
-		Row row = sheet.createRow(startIndex++);
-		addData(row, 0, "Styczeń", style);
-		List<Double> data = getDataFirstRow();
-		for (int i = 0; i < data.size(); i++) {
-			addData(row, i + 1, data.get(i), style);
-		}
 
-		row = sheet.createRow(startIndex++);
-		addData(row, 0, "Luty", style);
-		data = getDataSecondRow();
-		for (int i = 0; i < data.size(); i++) {
-			addData(row, i + 1, data.get(i), style);
+		Row row;
+		int columnIndex;
+		for (ExpenseRow expenseRow : ExpensesExcelReportDataProvider.getData()) {
+			row = sheet.createRow(startIndex++);
+			columnIndex = 0;
+			addData(row, columnIndex++, expenseRow.month(), style);
+			addData(row, columnIndex++, expenseRow.income(), style);
+			addData(row, columnIndex++, expenseRow.rent(), style);
+			addData(row, columnIndex++, expenseRow.feeding(), style);
+			addData(row, columnIndex++, expenseRow.other(), style);
 		}
 	}
 
 	private void addHeader(Workbook workBook, Sheet sheet) {
 		XSSFCellStyle style = StyleUtils.getHeaderStyle(workBook);
 		Row row = sheet.createRow(0);
-		List<String> list = List.of("Mc", "Przychód", "Mieszkanie", "Wyżywienie", "Transport", "Inne");
+		List<String> list = ExpensesExcelReportDataProvider.columnNames();
 		for (int i = 0; i < list.size(); i++) {
 			addData(row, i, list.get(i), style);
 		}
 	}
 
-	@SuppressWarnings("checkstyle:MagicNumber")
-	private List<Double> getDataFirstRow() {
-		return List.of(4000.0, 1100.0);
-	}
-
-	@SuppressWarnings("checkstyle:MagicNumber")
-	private List<Double> getDataSecondRow() {
-		return List.of(4000.0, 1010.0);
-	}
-
-	private void addData(Row row, int i, double v, XSSFCellStyle style) {
+	private void addData(Row row, int i, Double value, XSSFCellStyle style) {
+		if (value == null) {
+			return;
+		}
 		Cell data = row.createCell(i);
-		data.setCellValue(v);
+		data.setCellValue(value);
 		data.setCellStyle(style);
 	}
 
