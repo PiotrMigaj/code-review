@@ -18,13 +18,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.within;
 
 class ExpensesExcelReportTest {
 
-	private ExpensesExcelReport sut = new ExpensesExcelReport();
+	private ExpensesExcelReport sut = new ExpensesExcelReport(new ExpensesExcelReportDataProvider());
 
 	@Test
 	void shouldCreateExcelReport() throws IOException {
 		//given
 		//when
-		ByteArrayOutputStream result = sut.create();
+		ByteArrayOutputStream result = sut.create(new StyleParams());
 		//then
 		assertThat(result.size()).isGreaterThanOrEqualTo(3650);
 	}
@@ -34,7 +34,7 @@ class ExpensesExcelReportTest {
 		//given
 		int howManySheets;
 		//when
-		ByteArrayOutputStream result = sut.create();
+		ByteArrayOutputStream result = sut.create(new StyleParams());
 		try (InputStream createdReport = new ByteArrayInputStream(result.toByteArray())) {
 			try (Workbook workbook = new XSSFWorkbook(createdReport)) {
 				howManySheets = workbook.getNumberOfSheets();
@@ -50,7 +50,7 @@ class ExpensesExcelReportTest {
 		int howManyColumns;
 		List<String> expectedColumns = List.of("Mc", "Przychód", "Mieszkanie", "Wyżywienie", "Transport", "Inne");
 		//when
-		ByteArrayOutputStream result = sut.create();
+		ByteArrayOutputStream result = sut.create(new StyleParams());
 		try (InputStream createdReport = new ByteArrayInputStream(result.toByteArray())) {
 			try (Workbook workbook = new XSSFWorkbook(createdReport)) {
 				Row headerRow = workbook.getSheetAt(0).getRow(0);
@@ -69,7 +69,7 @@ class ExpensesExcelReportTest {
 		//given
 		int howManyRows;
 		//when
-		ByteArrayOutputStream result = sut.create();
+		ByteArrayOutputStream result = sut.create(new StyleParams());
 		try (InputStream createdReport = new ByteArrayInputStream(result.toByteArray())) {
 			try (Workbook workbook = new XSSFWorkbook(createdReport)) {
 				Row dataRow = workbook.getSheetAt(0).getRow(1);

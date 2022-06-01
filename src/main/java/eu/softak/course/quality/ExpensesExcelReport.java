@@ -12,13 +12,19 @@ import java.io.IOException;
 import java.util.List;
 
 public class ExpensesExcelReport {
-	public ByteArrayOutputStream create() throws IOException {
+	private final ReportDataProvider reportDataProvider;
+
+	public ExpensesExcelReport(ReportDataProvider reportDataProvider) {
+		this.reportDataProvider = reportDataProvider;
+	}
+
+	public ByteArrayOutputStream create(StyleParams styleParams) throws IOException {
 		Workbook workBook = new SXSSFWorkbook(-1);
 		workBook.getCreationHelper();
-		Sheet sheet = workBook.createSheet(ExpensesExcelReportDataProvider.sheetName());
+		Sheet sheet = workBook.createSheet(reportDataProvider.sheetName());
 
-		addHeader(workBook, sheet);
-		addRowsWithExpenses(workBook, sheet);
+		addHeader(workBook, sheet, styleParams);
+		addRowsWithExpenses(workBook, sheet, styleParams);
 		return write(workBook);
 	}
 
@@ -29,13 +35,13 @@ public class ExpensesExcelReport {
 		return outputStream;
 	}
 
-	private void addRowsWithExpenses(Workbook workBook, Sheet sheet) {
+	private void addRowsWithExpenses(Workbook workBook, Sheet sheet, StyleParams styleParams) {
 		int startIndex = 1;
-		XSSFCellStyle style = StyleUtils.getDataStyle(workBook);
+		XSSFCellStyle style = StyleUtils.getDataStyle(workBook, styleParams);
 
 		Row row;
 		int columnIndex;
-		for (ExpenseRow expenseRow : ExpensesExcelReportDataProvider.getData()) {
+		for (ExpenseRow expenseRow : reportDataProvider.getData()) {
 			row = sheet.createRow(startIndex++);
 			columnIndex = 0;
 			addData(row, columnIndex++, expenseRow.month(), style);
@@ -46,10 +52,10 @@ public class ExpensesExcelReport {
 		}
 	}
 
-	private void addHeader(Workbook workBook, Sheet sheet) {
-		XSSFCellStyle style = StyleUtils.getHeaderStyle(workBook);
+	private void addHeader(Workbook workBook, Sheet sheet, StyleParams styleParams) {
+		XSSFCellStyle style = StyleUtils.getHeaderStyle(workBook, styleParams);
 		Row row = sheet.createRow(0);
-		List<String> list = ExpensesExcelReportDataProvider.columnNames();
+		List<String> list = reportDataProvider.columnNames();
 		for (int i = 0; i < list.size(); i++) {
 			addData(row, i, list.get(i), style);
 		}
